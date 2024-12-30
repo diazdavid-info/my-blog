@@ -20,7 +20,7 @@ const { Content } = await render(post);
 <Layout>
     <div class="prose lg:prose-xl m-auto">
       <h1 class="text-4xl font-bold text-balance">{title}</h1>
-      <img class="h-full" src={image} alt={title} />
+      <img class="w-full aspect-video" src={image} alt={title} />
       <Content />
     </div>
 </Layout>
