@@ -18,9 +18,9 @@ const { Content } = await render(post);
 ---
 
 <Layout title={title} description={description}>
-    <div class="prose lg:prose-xl m-auto prose-img:w-auto max-w-none">
-      <h1 class="text-4xl font-bold text-balance">{h1}</h1>
-      <img class="w-full aspect-video" src={image} alt={title} />
+    <div class="prose m-auto prose-img:w-auto max-w-none prose-img:aspect-auto prose-h1:text-3xl prose-h2:text-2xl lg:prose-xl lg:prose-h1:text-5xl lg:prose-h2:text-3xl">
+      <h1>{h1}</h1>
+      <img src={image} alt={title} />
       <Content />
     </div>
 </Layout>
