@@ -10,7 +10,7 @@ const posts = await getCollection("posts");
   <section class="flex flex-col gap-4 mt-4">
     {
       posts.map((post: any) => (
-        <article class="flex flex-col gap-4 p-4 bg-white rounded-lg shadow-md max-w-64">
+        <article class="flex flex-col gap-4 p-4 bg-white rounded-lg shadow-md">
           <a href={post.slug}>
             <h2 class="text-2xl font-bold">{post.data.title}</h2>
           </a>
