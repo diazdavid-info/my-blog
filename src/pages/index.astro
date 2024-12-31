@@ -5,7 +5,7 @@ import { getCollection } from 'astro:content';
 const posts = await getCollection('posts');
 ---
 
-<Layout>
+<Layout title="Blog" description="Blog de Díaz">
 	<h1>Hello</h1>
 	<section class="flex flex-col gap-4 mt-4">
 		{posts.map((post: any) => (

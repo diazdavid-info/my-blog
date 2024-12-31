@@ -12,14 +12,14 @@ export async function getStaticPaths() {
 
 const { post } = Astro.props;
 const { data } = post;
-const { title, image } = data;
+const { title, description, h1, image,  } = data;
 
 const { Content } = await render(post);
 ---
 
-<Layout>
+<Layout title={title} description={description}>
     <div class="prose lg:prose-xl m-auto prose-img:w-auto max-w-none">
-      <h1 class="text-4xl font-bold text-balance">{title}</h1>
+      <h1 class="text-4xl font-bold text-balance">{h1}</h1>
       <img class="w-full aspect-video" src={image} alt={title} />
       <Content />
     </div>
