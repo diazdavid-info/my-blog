@@ -9,6 +9,7 @@ It is intentionally practical: commands first, then conventions, then caveats di
 
 - App type: small Astro blog deployed to Cloudflare.
 - Package manager: `pnpm` is the source of truth (`pnpm-lock.yaml` is committed).
+- Runtime requirement: Node.js `>=22.12.0` (`.node-version` pins `22.16.0`).
 - Styling: Tailwind CSS v4 plus `@tailwindcss/typography` via `@tailwindcss/vite`.
 - Content source: Markdown posts in `src/content/posts/` managed through Astro content collections configured in `src/content.config.ts`.
 - TypeScript mode: strict Astro preset via `tsconfig.json` extending `astro/tsconfigs/strict`.
@@ -24,6 +25,7 @@ It is intentionally practical: commands first, then conventions, then caveats di
 ## Validation Status Discovered During Analysis
 
 - `node --run dev` / `pnpm dev` starts successfully after pinning `wrangler@^4.73.0`, migrating Tailwind to the v4 Vite plugin setup, and fixing the content collections configuration.
+- Cloudflare Pages must use a Node 22+ build environment; the v2 build image defaults to Node 18 and will fail for Astro 6 unless overridden.
 - `pnpm astro check` is not usable yet because `@astrojs/check` is not installed.
 - `pnpm build` succeeds after setting the Cloudflare adapter to `prerenderEnvironment: "node"`, using compile-time image optimization, and moving the collection config to `src/content.config.ts`.
 - There is no dedicated lint script in `package.json`.
@@ -40,6 +42,7 @@ Use `pnpm` unless the user explicitly asks for another package manager.
 - Full build: `pnpm build`
 - Preview built output: `pnpm preview`
 - Direct Astro CLI: `pnpm astro ...`
+- For Cloudflare Pages, prefer build image v3 or set `NODE_VERSION=22.16.0` and `PNPM_VERSION=10.12.1`.
 
 ### Lint / Static Checks
 
