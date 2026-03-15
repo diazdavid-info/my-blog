@@ -8,6 +8,11 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineConfig({
   site: "https://diazdavid.es",
   integrations: [sitemap()],
+  markdown: {
+    shikiConfig: {
+      theme: "vitesse-dark",
+    },
+  },
   vite: {
     plugins: [tailwindcss()],
   },

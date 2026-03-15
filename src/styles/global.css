@@ -1,2 +1,186 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-serif: "Instrument Serif", Georgia, serif;
+  --font-mono: "JetBrains Mono", "Fira Code", monospace;
+
+  --color-surface: #0f0f0e;
+  --color-elevated: #1a1a18;
+  --color-border: #2a2a26;
+  --color-ink: #ece8e1;
+  --color-muted: #8a8680;
+  --color-accent: #e2a858;
+  --color-accent-dim: #e2a85820;
+}
+
+html {
+  background-color: var(--color-surface);
+  color: var(--color-ink);
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--color-accent), transparent);
+  z-index: 50;
+  pointer-events: none;
+}
+
+::selection {
+  background-color: var(--color-accent-dim);
+  color: var(--color-accent);
+}
+
+/* --- Prose (article content) --- */
+
+.prose {
+  --tw-prose-body: var(--color-ink);
+  --tw-prose-headings: var(--color-ink);
+  --tw-prose-links: var(--color-accent);
+  --tw-prose-bold: var(--color-ink);
+  --tw-prose-code: var(--color-accent);
+  --tw-prose-pre-bg: var(--color-elevated);
+  --tw-prose-pre-code: var(--color-ink);
+  --tw-prose-quotes: var(--color-muted);
+  --tw-prose-quote-borders: var(--color-accent);
+  --tw-prose-hr: var(--color-border);
+  --tw-prose-th-borders: var(--color-border);
+  --tw-prose-td-borders: var(--color-border);
+  --tw-prose-counters: var(--color-muted);
+  --tw-prose-bullets: var(--color-muted);
+  --tw-prose-captions: var(--color-muted);
+}
+
+/* --- Code blocks --- */
+
+.prose pre {
+  background-color: var(--color-elevated) !important;
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+  padding: 1.25rem 1.5rem;
+  font-size: 0.875em;
+  line-height: 1.8;
+  position: relative;
+  tab-size: 2;
+}
+
+.prose pre[data-language]::before {
+  content: attr(data-language);
+  position: absolute;
+  top: 0.6rem;
+  right: 0.75rem;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-muted);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.prose pre code {
+  font-family: var(--font-mono), monospace;
+  background: none !important;
+  padding: 0;
+  border-radius: 0;
+  font-size: inherit;
+  color: inherit;
+}
+
+.prose pre code {
+  counter-reset: line;
+}
+
+.prose pre .line {
+  display: inline-block;
+  min-height: 1em;
+}
+
+.prose pre .line::before {
+  counter-increment: line;
+  content: counter(line);
+  display: inline-block;
+  width: 2ch;
+  margin-right: 1.5ch;
+  text-align: right;
+  color: var(--color-muted);
+  opacity: 0.35;
+  font-size: 0.85em;
+  user-select: none;
+}
+
+/* Scrollbar */
+.prose pre::-webkit-scrollbar {
+  height: 6px;
+}
+
+.prose pre::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.prose pre::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 3px;
+}
+
+.prose pre::-webkit-scrollbar-thumb:hover {
+  background: var(--color-muted);
+}
+
+/* --- Inline code --- */
+
+.prose code:not(pre code) {
+  font-family: var(--font-mono), monospace;
+  background-color: var(--color-accent-dim);
+  color: var(--color-accent);
+  padding: 0.2em 0.4em;
+  border-radius: 0.3em;
+  font-size: 0.85em;
+  font-weight: 400;
+}
+
+.prose code:not(pre code)::before,
+.prose code:not(pre code)::after {
+  content: none;
+}
+
+.prose a {
+  text-decoration-color: var(--color-accent-dim);
+  text-underline-offset: 3px;
+  transition: text-decoration-color 0.2s;
+}
+
+.prose a:hover {
+  text-decoration-color: var(--color-accent);
+}
+
+.prose img {
+  border-radius: 0.75rem;
+  border: 1px solid var(--color-border);
+}
+
+/* --- Animations --- */
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.6s ease-out both;
+}

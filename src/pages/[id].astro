@@ -16,17 +16,49 @@ interface Props {
 
 const { post } = Astro.props as Props;
 const { data } = post;
-const { title, description, h1, image } = data;
+const { title, description, h1, image, date, author } = data;
 
 const { Content } = await render(post);
+
+function formatDate(d: string): string {
+  return new Date(d).toLocaleDateString("es-ES", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+}
 ---
 
 <Layout title={title} description={description}>
-  <div
-    class="prose m-auto prose-img:w-auto max-w-none prose-img:aspect-video prose-img:object-contain prose-img:mx-auto prose-h1:text-3xl prose-h2:text-2xl lg:prose-xl lg:prose-h1:text-5xl lg:prose-h2:text-3xl lg:prose-h3:text-2xl"
+  <a
+    href="/"
+    class="inline-flex items-center gap-1.5 text-muted hover:text-accent text-sm transition-colors duration-200 mb-8"
   >
-    <h1>{h1}</h1>
-    <img src={image} alt={title} />
-    <Content />
-  </div>
+    <span aria-hidden="true">&larr;</span> Volver
+  </a>
+
+  <article class="animate-fade-up">
+    <header class="mb-10">
+      <div class="flex items-center gap-3 text-sm text-muted font-mono mb-4">
+        <time>{formatDate(date)}</time>
+        <span class="text-border">·</span>
+        <span>{author}</span>
+      </div>
+      <h1 class="font-serif text-4xl lg:text-5xl text-ink leading-tight">
+        {h1}
+      </h1>
+    </header>
+
+    <img
+      src={image}
+      alt={title}
+      class="w-full aspect-video object-cover rounded-xl border border-border mb-10"
+    />
+
+    <div
+      class="prose max-w-none lg:prose-lg prose-h2:font-serif prose-h2:font-normal prose-h3:font-serif prose-h3:font-normal"
+    >
+      <Content />
+    </div>
+  </article>
 </Layout>
