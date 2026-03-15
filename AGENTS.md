@@ -9,7 +9,7 @@ It is intentionally practical: commands first, then conventions, then caveats di
 
 - App type: small static Astro blog deployed to Cloudflare Pages.
 - Package manager: `pnpm` is the source of truth (`pnpm-lock.yaml` is committed).
-- Runtime requirement: Node.js `>=22.12.0` (`.node-version` pins `22.16.0`).
+- Runtime requirement: Node.js `>=22.12.0`.
 - Styling: Tailwind CSS v4 plus `@tailwindcss/typography` via `@tailwindcss/vite`.
 - Content source: Markdown posts in `src/content/posts/` managed through Astro content collections configured in `src/content.config.ts`.
 - TypeScript mode: strict Astro preset via `tsconfig.json` extending `astro/tsconfigs/strict`.
@@ -26,6 +26,7 @@ It is intentionally practical: commands first, then conventions, then caveats di
 
 - `node --run dev` / `pnpm dev` starts successfully after migrating Tailwind to the v4 Vite plugin setup and fixing the content collections configuration.
 - Cloudflare Pages must use a Node 22+ build environment; the v2 build image defaults to Node 18 and will fail for Astro 6 unless overridden.
+- This repo may optionally include `.node-version` for local tooling, but the deployed source of truth is the Cloudflare Pages environment configuration.
 - `pnpm astro check` is not usable yet because `@astrojs/check` is not installed.
 - `pnpm build` succeeds as a plain static Astro build after removing the Cloudflare adapter and moving the collection config to `src/content.config.ts`.
 - The repository intentionally does not include a root Wrangler config because this static Pages deployment does not need one, and having one causes noisy Pages warnings.
@@ -43,7 +44,7 @@ Use `pnpm` unless the user explicitly asks for another package manager.
 - Full build: `pnpm build`
 - Preview built output: `pnpm preview`
 - Direct Astro CLI: `pnpm astro ...`
-- For Cloudflare Pages, prefer build image v3 or set `NODE_VERSION=22.16.0` and `PNPM_VERSION=10.12.1`.
+- For Cloudflare Pages, prefer build image v3 or set `NODE_VERSION=22.16.0` and `PNPM_VERSION=10.12.1` in the project settings.
 
 ### Lint / Static Checks
 
