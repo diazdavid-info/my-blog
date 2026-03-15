@@ -10,9 +10,9 @@ posts.reverse();
   <h1></h1>
   <section class="grid md:grid-cols-2 gap-4 mt-4">
     {
-      posts.map((post: any) => (
+      posts.map((post) => (
         <article class="flex flex-col gap-4 p-4 bg-white rounded-lg shadow-md">
-          <a href={post.slug}>
+          <a href={`/${post.id}`}>
             <h2 class="text-2xl font-bold">{post.data.title}</h2>
           </a>
           <p class="text-gray-500 text-sm">{post.data.date}</p>

@@ -3,17 +3,18 @@ import { defineConfig } from "astro/config";
 
 import cloudflare from "@astrojs/cloudflare";
 
-import tailwind from "@astrojs/tailwind";
-
 import sitemap from "@astrojs/sitemap";
+import tailwindcss from "@tailwindcss/vite";
 
 // https://astro.build/config
 export default defineConfig({
   site: "https://diazdavid.es",
   adapter: cloudflare({
-    platformProxy: {
-      enabled: true,
-    },
+    imageService: "compile",
+    prerenderEnvironment: "node",
   }),
-  integrations: [tailwind(), sitemap()],
+  integrations: [sitemap()],
+  vite: {
+    plugins: [tailwindcss()],
+  },
 });
