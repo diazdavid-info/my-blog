@@ -1,6 +1,6 @@
 ---
-title: "Cómo configurar el debug de un proyecto React con IntelliJ"
-description: "Aprenderemos a configurar el entorno de depuración para un proyecto de React utilizando IntelliJ IDEA de la forma más fácil y eficiente."
+title: "Cómo configurar el debug de React en IntelliJ IDEA"
+description: "Crea una configuración de JavaScript Debug en IntelliJ IDEA para depurar tu proyecto React. Conecta el IDE con el servidor de desarrollo y añade breakpoints."
 h1: "Cómo configurar el debug de un proyecto React con IntelliJ"
 author: "Díaz"
 date: "2024-12-30"

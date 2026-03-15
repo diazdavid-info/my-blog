@@ -1,6 +1,6 @@
 ---
-title: "Simular diferentes timezone en el navegador Chrome"
-description: "Si necesitas simular diferentes timezones, puedes hacerlo de una forma muy fácil en Chrome."
+title: "Cómo simular diferentes zonas horarias en Chrome DevTools"
+description: "Cómo cambiar la zona horaria en Chrome desde los Sensors de DevTools para probar tu aplicación web en distintos husos horarios y verificarlo desde la consola."
 h1: "Simular diferentes timezone en el navegador Chrome"
 author: "Díaz"
 date: "2025-03-17"

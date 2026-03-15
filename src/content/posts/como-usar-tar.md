@@ -1,6 +1,6 @@
 ---
-title: "Cómo comprimir y descomprimir con tar"
-description: "En este post, aprenderemos a usar tar para comprimir y descomprimir archivos."
+title: "Cómo usar tar para comprimir y descomprimir archivos"
+description: "Guía de tar con ejemplos claros: comprimir y extraer archivos .tar.gz y .tar.bz2, usar wildcards, excluir archivos y descomprimir en un directorio concreto."
 h1: "Cómo usar tar para comprimir y descomprimir archivos"
 author: "Díaz"
 date: "2025-02-12"
