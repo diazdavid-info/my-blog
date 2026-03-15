@@ -6,13 +6,13 @@
   --font-serif: "Instrument Serif", Georgia, serif;
   --font-mono: "JetBrains Mono", "Fira Code", monospace;
 
-  --color-surface: #0f0f0e;
-  --color-elevated: #1a1a18;
-  --color-border: #2a2a26;
-  --color-ink: #ece8e1;
-  --color-muted: #8a8680;
-  --color-accent: #e2a858;
-  --color-accent-dim: #e2a85820;
+  --color-surface: #f8f6f1;
+  --color-elevated: #ffffff;
+  --color-border: #e5e0d8;
+  --color-ink: #2c2a28;
+  --color-muted: #8a857d;
+  --color-accent: #a06a24;
+  --color-accent-dim: #a06a2418;
 }
 
 html {
