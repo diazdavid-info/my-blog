@@ -1,5 +1,0 @@
-{
-  "name": "my-blog"
-  // Add your bindings here, e.g.:
-  // "kv_namespaces": [{ "binding": "MY_KV", "id": "<namespace_id>" }]
-}

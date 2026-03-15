@@ -7,13 +7,13 @@ It is intentionally practical: commands first, then conventions, then caveats di
 
 ## Repository Snapshot
 
-- App type: small Astro blog deployed to Cloudflare.
+- App type: small static Astro blog deployed to Cloudflare Pages.
 - Package manager: `pnpm` is the source of truth (`pnpm-lock.yaml` is committed).
 - Runtime requirement: Node.js `>=22.12.0` (`.node-version` pins `22.16.0`).
 - Styling: Tailwind CSS v4 plus `@tailwindcss/typography` via `@tailwindcss/vite`.
 - Content source: Markdown posts in `src/content/posts/` managed through Astro content collections configured in `src/content.config.ts`.
 - TypeScript mode: strict Astro preset via `tsconfig.json` extending `astro/tsconfigs/strict`.
-- Key files: `astro.config.mjs`, `.prettierrc.mjs`, `src/layouts/Layout.astro`, `src/styles/global.css`, `src/pages/index.astro`, `src/pages/[id].astro`, `src/content.config.ts`, `wrangler.jsonc`.
+- Key files: `astro.config.mjs`, `.prettierrc.mjs`, `src/layouts/Layout.astro`, `src/styles/global.css`, `src/pages/index.astro`, `src/pages/[id].astro`, `src/content.config.ts`.
 
 ## Agent Rules Files Present
 
@@ -24,10 +24,11 @@ It is intentionally practical: commands first, then conventions, then caveats di
 
 ## Validation Status Discovered During Analysis
 
-- `node --run dev` / `pnpm dev` starts successfully after pinning `wrangler@^4.73.0`, migrating Tailwind to the v4 Vite plugin setup, and fixing the content collections configuration.
+- `node --run dev` / `pnpm dev` starts successfully after migrating Tailwind to the v4 Vite plugin setup and fixing the content collections configuration.
 - Cloudflare Pages must use a Node 22+ build environment; the v2 build image defaults to Node 18 and will fail for Astro 6 unless overridden.
 - `pnpm astro check` is not usable yet because `@astrojs/check` is not installed.
-- `pnpm build` succeeds after setting the Cloudflare adapter to `prerenderEnvironment: "node"`, using compile-time image optimization, and moving the collection config to `src/content.config.ts`.
+- `pnpm build` succeeds as a plain static Astro build after removing the Cloudflare adapter and moving the collection config to `src/content.config.ts`.
+- The repository intentionally does not include a root Wrangler config because this static Pages deployment does not need one, and having one causes noisy Pages warnings.
 - There is no dedicated lint script in `package.json`.
 - There is no automated test framework configured in `package.json` or config files.
 
@@ -147,7 +148,7 @@ Follow existing project conventions before applying general preferences.
 
 ## Known Codebase Issues Worth Preserving In Context
 
-- `src/pages/index.astro` and `src/pages/[id].astro` currently type posts as `any`; improving that would be a safe cleanup.
+- `src/pages/[id].astro` still types `Astro.props` via an explicit cast; further cleanup could improve this.
 - `README.md` is still the default Astro starter README and is not a reliable source of project-specific workflow.
 
 ## When Editing This Repo
