@@ -4,9 +4,12 @@ import "../styles/global.css";
 interface Props {
   title: string;
   description: string;
+  image?: string;
+  isHome?: boolean;
 }
 
-const { title, description } = Astro.props;
+const { title, description, image, isHome = false } = Astro.props;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 ---
 
 <!doctype html>
@@ -16,6 +19,13 @@ const { title, description } = Astro.props;
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="sitemap" href="/sitemap-index.xml" />
+    <link rel="canonical" href={canonicalURL.href} />
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title="Díaz — Blog"
+      href="/rss.xml"
+    />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -24,12 +34,38 @@ const { title, description } = Astro.props;
     />
     <title>{title}</title>
     <meta name="description" content={description} />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content={isHome ? "website" : "article"} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalURL.href} />
+    <meta property="og:locale" content="es_ES" />
+    <meta property="og:site_name" content="Díaz" />
+    {image && <meta property="og:image" content={image} />}
+
+    <!-- Twitter -->
+    <meta
+      name="twitter:card"
+      content={image ? "summary_large_image" : "summary"}
+    />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    {image && <meta name="twitter:image" content={image} />}
+
+    <slot name="head" />
   </head>
   <body class="min-h-screen flex flex-col font-sans">
     <header class="max-w-3xl w-full mx-auto px-5 sm:px-6 pt-10 pb-6">
       <nav>
         <a href="/" class="group inline-flex items-baseline gap-3">
-          <span class="font-serif text-3xl text-accent">Díaz</span>
+          {
+            isHome ? (
+              <h1 class="font-serif text-3xl text-accent">Díaz</h1>
+            ) : (
+              <span class="font-serif text-3xl text-accent">Díaz</span>
+            )
+          }
           <span
             class="text-muted text-sm hidden sm:inline transition-colors duration-200 group-hover:text-ink"
           >

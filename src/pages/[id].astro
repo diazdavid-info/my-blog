@@ -27,9 +27,26 @@ function formatDate(d: string): string {
     year: "numeric",
   });
 }
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  headline: title,
+  description,
+  image,
+  datePublished: date,
+  author: {
+    "@type": "Person",
+    name: author,
+  },
+  mainEntityOfPage: {
+    "@type": "WebPage",
+    "@id": new URL(Astro.url.pathname, Astro.site).href,
+  },
+};
 ---
 
-<Layout title={title} description={description}>
+<Layout title={title} description={description} image={image}>
   <a
     href="/"
     class="inline-flex items-center gap-1.5 text-muted hover:text-accent text-sm transition-colors duration-200 mb-8"
@@ -40,7 +57,7 @@ function formatDate(d: string): string {
   <article class="animate-fade-up">
     <header class="mb-10">
       <div class="flex items-center gap-3 text-sm text-muted font-mono mb-4">
-        <time>{formatDate(date)}</time>
+        <time datetime={date}>{formatDate(date)}</time>
         <span class="text-border">·</span>
         <span>{author}</span>
       </div>
@@ -61,4 +78,6 @@ function formatDate(d: string): string {
       <Content />
     </div>
   </article>
+
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 </Layout>

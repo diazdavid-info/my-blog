@@ -21,6 +21,8 @@ function formatDate(date: string): string {
 <Layout
   title="Díaz — Blog"
   description="Un cuaderno técnico con guías prácticas, debugging, terminal y pequeños atajos para desarrollar con menos fricción."
+  image={featured.data.image}
+  isHome
 >
   <section>
     <p class="text-muted text-lg mb-12 max-w-xl leading-relaxed">
@@ -40,7 +42,7 @@ function formatDate(date: string): string {
           />
         </div>
         <div class="p-6 flex flex-col justify-center">
-          <time class="text-sm text-muted font-mono">
+          <time class="text-sm text-muted font-mono" datetime={featured.data.date}>
             {formatDate(featured.data.date)}
           </time>
           <h2
@@ -73,7 +75,10 @@ function formatDate(date: string): string {
                   />
                 </div>
                 <div class="p-5">
-                  <time class="text-sm text-muted font-mono">
+                  <time
+                    class="text-sm text-muted font-mono"
+                    datetime={post.data.date}
+                  >
                     {formatDate(post.data.date)}
                   </time>
                   <h2 class="text-lg font-semibold text-ink mt-2 leading-snug group-hover:text-accent transition-colors duration-200">
