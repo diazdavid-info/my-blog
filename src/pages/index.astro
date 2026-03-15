@@ -7,6 +7,8 @@ posts.sort(
   (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime(),
 );
 
+const [featured, ...rest] = posts;
+
 function formatDate(date: string): string {
   return new Date(date).toLocaleDateString("es-ES", {
     day: "numeric",
@@ -21,42 +23,71 @@ function formatDate(date: string): string {
   description="Un cuaderno técnico con guías prácticas, debugging, terminal y pequeños atajos para desarrollar con menos fricción."
 >
   <section>
-    <p class="text-muted text-lg mb-10 max-w-xl leading-relaxed">
+    <p class="text-muted text-lg mb-12 max-w-xl leading-relaxed">
       Guías prácticas, debugging, terminal y pequeños atajos para desarrollar
       con menos fricción.
     </p>
 
-    <div class="grid sm:grid-cols-2 gap-5">
-      {
-        posts.map((post, i) => (
-          <article
-            class="group rounded-xl border border-border bg-elevated overflow-hidden transition-all duration-300 hover:border-accent/40 animate-fade-up"
-            style={`animation-delay: ${i * 100}ms`}
+    <article
+      class="group rounded-xl border border-border bg-elevated overflow-hidden transition-all duration-300 hover:border-accent/40 animate-fade-up"
+    >
+      <a href={`/${featured.id}`} class="block md:flex">
+        <div class="md:w-3/5 shrink-0 overflow-hidden">
+          <img
+            class="w-full aspect-video object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+            src={featured.data.image}
+            alt={featured.data.title}
+          />
+        </div>
+        <div class="p-6 flex flex-col justify-center">
+          <time class="text-sm text-muted font-mono">
+            {formatDate(featured.data.date)}
+          </time>
+          <h2
+            class="text-xl md:text-2xl font-semibold text-ink mt-3 leading-snug group-hover:text-accent transition-colors duration-200"
           >
-            <a href={`/${post.id}`} class="block">
-              <div class="overflow-hidden">
-                <img
-                  class="w-full aspect-video object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-                  src={post.data.image}
-                  alt={post.data.title}
-                  loading="lazy"
-                />
-              </div>
-              <div class="p-5">
-                <time class="text-sm text-muted font-mono">
-                  {formatDate(post.data.date)}
-                </time>
-                <h2 class="text-lg font-semibold text-ink mt-2 leading-snug group-hover:text-accent transition-colors duration-200">
-                  {post.data.title}
-                </h2>
-                <p class="text-muted text-sm mt-2 line-clamp-2">
-                  {post.data.description}
-                </p>
-              </div>
-            </a>
-          </article>
-        ))
-      }
-    </div>
+            {featured.data.title}
+          </h2>
+          <p class="text-muted text-sm mt-3 line-clamp-3">
+            {featured.data.description}
+          </p>
+        </div>
+      </a>
+    </article>
+
+    {
+      rest.length > 0 && (
+        <div class="grid sm:grid-cols-2 gap-5 mt-5">
+          {rest.map((post, i) => (
+            <article
+              class="group rounded-xl border border-border bg-elevated overflow-hidden transition-all duration-300 hover:border-accent/40 animate-fade-up"
+              style={`animation-delay: ${(i + 1) * 100}ms`}
+            >
+              <a href={`/${post.id}`} class="block">
+                <div class="overflow-hidden">
+                  <img
+                    class="w-full aspect-video object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                    src={post.data.image}
+                    alt={post.data.title}
+                    loading="lazy"
+                  />
+                </div>
+                <div class="p-5">
+                  <time class="text-sm text-muted font-mono">
+                    {formatDate(post.data.date)}
+                  </time>
+                  <h2 class="text-lg font-semibold text-ink mt-2 leading-snug group-hover:text-accent transition-colors duration-200">
+                    {post.data.title}
+                  </h2>
+                  <p class="text-muted text-sm mt-2 line-clamp-2">
+                    {post.data.description}
+                  </p>
+                </div>
+              </a>
+            </article>
+          ))}
+        </div>
+      )
+    }
   </section>
 </Layout>
