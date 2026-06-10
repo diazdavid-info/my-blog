@@ -7,26 +7,24 @@ date: "2026-04-30"
 image: "https://cdn.diazdavid.es/testing-library/getbyrole-findbyrole-waitfor-testing-library.webp"
 ---
 
-Si alguna vez has arreglado un test metiendo un `waitFor` "por si acaso", este post es para ti.
+Si alguna vez has arreglado un test que fallaba de forma intermitente metiendo un `waitFor` "por si acaso", este post te interesa. A mí me ha pasado más veces de las que me gustaría admitir, y casi siempre el problema era el mismo: estaba usando la query equivocada.
 
-Cuando un test de frontend falla de forma intermitente, muchas veces el problema no está en el componente, sino en cómo estamos buscando los elementos. Testing Library te da varias formas de mirar el DOM, pero cada una cuenta una historia distinta.
+Cuando un test de frontend falla de vez en cuando, lo normal es sospechar del componente. Pero muchas veces el fallo está en cómo buscamos los elementos del DOM. Testing Library ofrece varias queries y cada una sirve para una situación distinta: comprobar que algo ya está en pantalla, esperar a que aparezca o asegurarnos de que no existe.
 
-No es lo mismo decir "esto ya debería estar" que decir "esto aparecerá después" o "esto no debería existir". Ahí está la diferencia entre `screen.getByRole`, `screen.findByRole`, `screen.queryByRole` y `waitFor`.
+Esta tabla resume las diferencias, y el resto del post explica cada caso con ejemplos:
 
-La regla rápida es esta:
+| Query        | Espera | Si no encuentra             | Cuándo usarla                                   |
+| ------------ | ------ | --------------------------- | ----------------------------------------------- |
+| `getBy...`   | No     | Lanza error                 | El elemento ya debe estar en pantalla           |
+| `findBy...`  | Sí     | Lanza error tras el timeout | El elemento aparecerá tras una acción asíncrona |
+| `queryBy...` | No     | Devuelve `null`             | Quieres comprobar que algo no está              |
+| `waitFor`    | Sí     | Reintenta la aserción       | Esperas algo que no es encontrar un elemento    |
 
-| Query        | Espera | Si no encuentra          | Úsala cuando                                           |
-| ------------ | ------ | ------------------------ | ------------------------------------------------------ |
-| `getBy...`   | No     | Lanza error              | El elemento debe estar ya en pantalla                  |
-| `findBy...`  | Sí     | Lanza error tras timeout | El elemento aparecerá después de una acción asíncrona  |
-| `queryBy...` | No     | Devuelve `null`          | Quieres comprobar que algo no está                     |
-| `waitFor`    | Sí     | Reintenta una aserción   | Esperas un efecto que no es solo encontrar un elemento |
+## Por qué usar getByRole y no otra query
 
-## Empieza por el rol
+Antes de entrar en las diferencias, una recomendación general: siempre que puedas, busca los elementos por su rol con `getByRole` o alguna de sus variantes (`findByRole`, `queryByRole`, `getAllByRole`...).
 
-La query más recomendable suele ser `getByRole` o alguna de sus variantes (`findByRole`, `queryByRole`, `getAllByRole`, etc.).
-
-El motivo es sencillo: se acerca a cómo una persona o una tecnología asistiva encuentra la interfaz. Botones, enlaces, encabezados, campos de texto, diálogos, alertas. Si tu test puede encontrar algo por rol, normalmente tu interfaz también está contando mejor lo que es.
+El motivo es que los roles se parecen mucho a cómo una persona, o un lector de pantalla, encuentra las cosas en la interfaz: botones, enlaces, encabezados, campos de texto... Si un test puede encontrar un elemento por su rol, suele ser buena señal de que el HTML está bien construido.
 
 ```javascript
 screen.getByRole("button", { name: /guardar/i });
@@ -34,23 +32,21 @@ screen.getByRole("heading", { name: /perfil/i });
 screen.getByRole("link", { name: /volver/i });
 ```
 
-El segundo argumento, `name`, es clave. Evita buscar "un botón cualquiera" y deja escrita la intención del test.
+El segundo argumento, `name`, es importante. Sin él estás buscando "un botón cualquiera", y en cuanto haya dos botones en pantalla el test fallará.
 
 ```javascript
-// Peor: puede haber varios botones.
+// Puede haber varios botones y el test fallará
 screen.getByRole("button");
 
-// Mejor: describe el botón que una persona intentaría pulsar.
+// Mejor: busca el botón concreto que el usuario pulsaría
 screen.getByRole("button", { name: /crear cuenta/i });
 ```
 
-## `getByRole`: para lo que ya existe
+## getByRole: el elemento ya está en pantalla
 
-`screen.getByRole` es síncrono. Busca una vez y devuelve el elemento si lo encuentra.
+`screen.getByRole` es síncrono: busca el elemento una sola vez. Si no lo encuentra, lanza un error y el test falla en ese momento. Si encuentra más de uno, también falla.
 
-Si no lo encuentra, falla inmediatamente. Si encuentra más de una coincidencia, también falla.
-
-Es una forma de decirle al test: "esto forma parte del estado actual de la pantalla".
+Úsalo cuando el elemento debería existir justo después del `render` o de una acción que ya ha terminado.
 
 ```javascript
 render(<LoginForm />);
@@ -62,7 +58,7 @@ expect(
 await user.click(screen.getByRole("button", { name: /entrar/i }));
 ```
 
-Úsalo cuando el elemento debería estar disponible justo después del `render` o después de una acción que ya ha terminado.
+Por ejemplo, si un click actualiza el estado de forma inmediata, no necesitas esperar nada:
 
 ```javascript
 const user = userEvent.setup();
@@ -74,15 +70,13 @@ await user.click(screen.getByRole("button", { name: /incrementar/i }));
 expect(screen.getByRole("status")).toHaveTextContent("1");
 ```
 
-En este ejemplo no hace falta `findByRole` ni `waitFor` si el click actualiza el estado de forma inmediata. Añadir espera aquí solo mete ruido y hace que el test parezca más complejo de lo que es.
+Aquí no hace falta ni `findByRole` ni `waitFor`. Añadir esperas donde no las hay solo mete ruido y hace que el test parezca más complicado de lo que es.
 
-## `findByRole`: para lo que aparecerá después
+## findByRole: el elemento aparecerá después
 
-`screen.findByRole` es asíncrono. Devuelve una promesa y reintenta la búsqueda hasta que el elemento aparece o se agota el timeout.
+`screen.findByRole` es asíncrono: devuelve una promesa y reintenta la búsqueda hasta que el elemento aparece o se agota el timeout (un segundo por defecto).
 
-Es la opción correcta cuando el DOM cambia después de una promesa, una petición simulada, un indicador de carga o cualquier actualización asíncrona.
-
-Con `findByRole` estás diciendo: "esto todavía no está, pero debe aparecer".
+Es la opción correcta cuando el DOM cambia después de algo asíncrono: una petición HTTP, una promesa, un loader que tarda en resolverse...
 
 ```javascript
 const user = userEvent.setup();
@@ -97,72 +91,57 @@ expect(
 ).toBeInTheDocument();
 ```
 
-Internamente, puedes pensar en `findByRole` como una combinación de `getByRole` y `waitFor`.
-
-Por eso esto suele ser innecesario:
+Internamente puedes pensar en `findByRole` como un `getByRole` envuelto en un `waitFor`. Por eso no tiene sentido combinarlos:
 
 ```javascript
-// Evítalo: findByRole ya espera.
+// Redundante: findByRole ya espera por sí solo
 await waitFor(async () => {
   expect(await screen.findByRole("alert")).toHaveTextContent(/guardado/i);
 });
-```
 
-Mejor:
-
-```javascript
+// Suficiente
 expect(await screen.findByRole("alert")).toHaveTextContent(/guardado/i);
 ```
 
-## `queryByRole`: para comprobar ausencia
+## queryByRole: el elemento no debe estar
 
-`screen.queryByRole` es síncrono, pero no lanza error cuando no encuentra nada. Devuelve `null`.
+`screen.queryByRole` es síncrono como `getByRole`, pero con una diferencia: si no encuentra nada devuelve `null` en lugar de lanzar un error.
 
-Eso lo hace perfecto para afirmar que algo no está en el DOM. Es la query de las ausencias.
+Esto lo convierte en la única opción válida para comprobar que algo no está en el DOM:
 
 ```javascript
 render(<Dashboard />);
 
-expect(screen.queryByRole("alert", { name: /error/i })).not.toBeInTheDocument();
-```
-
-No uses `getByRole` para comprobar ausencia, porque el propio `getByRole` fallaría antes de llegar al `expect`.
-
-```javascript
-// Mal: getByRole lanza error si no encuentra el elemento.
-expect(screen.getByRole("alert")).not.toBeInTheDocument();
-
-// Bien.
 expect(screen.queryByRole("alert")).not.toBeInTheDocument();
 ```
 
-## `getAllBy`, `findAllBy` y `queryAllBy`
+Si intentas hacer esta comprobación con `getByRole`, el error saltará antes de llegar al `expect`:
 
-Cuando esperas más de un elemento, usa las variantes `All`. No es un detalle menor: si tu pantalla tiene tres elementos y el test busca uno solo, estás dejando ambigüedad dentro del test.
+```javascript
+// Mal: getByRole lanza un error si no encuentra el elemento
+expect(screen.getByRole("alert")).not.toBeInTheDocument();
+
+// Bien
+expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+```
+
+## Las variantes getAllBy, findAllBy y queryAllBy
+
+Cuando esperas más de un elemento, usa las variantes `All`, que devuelven un array:
 
 ```javascript
 expect(screen.getAllByRole("listitem")).toHaveLength(3);
 ```
 
-Las reglas son las mismas:
-
-| Query           | Si no encuentra          | Si encuentra uno o más     |
-| --------------- | ------------------------ | -------------------------- |
-| `getAllBy...`   | Lanza error              | Devuelve array             |
-| `findAllBy...`  | Lanza error tras timeout | Devuelve promesa con array |
-| `queryAllBy...` | Devuelve `[]`            | Devuelve array             |
-
-Para ausencia múltiple, `queryAllBy...` suele ser más claro.
+Se comportan igual que sus versiones individuales: `getAllByRole` lanza un error si no encuentra nada, `findAllByRole` espera, y `queryAllByRole` devuelve un array vacío, lo que resulta útil para comprobar ausencias múltiples:
 
 ```javascript
 expect(screen.queryAllByRole("listitem")).toHaveLength(0);
 ```
 
-## Cuándo usar `waitFor`
+## Cuándo usar waitFor
 
-`waitFor` sirve para esperar a que una aserción deje de fallar.
-
-No espera porque devuelvas `false`. Reintenta porque dentro se lanza un error, normalmente desde un `expect`. Esta parte es importante: `waitFor` no espera "un rato"; espera a que una expectativa se cumpla.
+`waitFor` ejecuta un callback una y otra vez hasta que deja de lanzar errores o se agota el timeout. Como un `expect` que falla lanza un error, en la práctica sirve para esperar a que una aserción se cumpla.
 
 ```javascript
 await waitFor(() => {
@@ -170,14 +149,11 @@ await waitFor(() => {
 });
 ```
 
-Es útil cuando lo que quieres esperar no es simplemente que aparezca un elemento. Para encontrar elementos que aparecen, normalmente `findBy...` expresa mejor la intención.
+Su sitio está en las esperas que no consisten en encontrar un elemento:
 
-Casos habituales:
-
-- Esperar a que un mock haya sido llamado.
-- Esperar a que una función se llame con ciertos argumentos.
-- Esperar a que una URL, un store o un estado externo cambie.
-- Esperar a que un atributo o texto cambie cuando no tienes una query más directa.
+- Que un mock haya sido llamado, o llamado con ciertos argumentos.
+- Que cambie una URL, un store o cualquier estado externo al DOM.
+- Que cambie un atributo o un texto cuando no tienes una query más directa.
 
 ```javascript
 await user.click(screen.getByRole("button", { name: /guardar/i }));
@@ -187,50 +163,43 @@ await waitFor(() => {
 });
 ```
 
-## Cuándo no usar `waitFor`
+## Cuándo no usar waitFor
 
-No uses `waitFor` si una query asíncrona expresa mejor la intención. `waitFor` no debería ser el comodín que tapa cualquier duda del test.
+Si lo que esperas es que aparezca un elemento, usa `findBy...` en lugar de `waitFor`. Hacen lo mismo, pero `findBy...` lo dice más claro:
 
 ```javascript
-// Más ruido del necesario.
+// Funciona, pero hay una forma más directa
 await waitFor(() => {
   expect(screen.getByRole("alert")).toHaveTextContent(/guardado/i);
 });
-```
 
-Si la alerta aparece después de la acción, usa `findByRole`:
-
-```javascript
+// Mejor
 expect(await screen.findByRole("alert")).toHaveTextContent(/guardado/i);
 ```
 
-Tampoco metas acciones de usuario dentro de `waitFor`. El callback puede ejecutarse varias veces, así que también podrías estar haciendo click varias veces sin darte cuenta.
+Y sobre todo, no metas acciones de usuario dentro del callback. Como `waitFor` puede ejecutarlo varias veces, podrías acabar haciendo click varias veces sin darte cuenta:
 
 ```javascript
-// Mal: la acción puede ejecutarse varias veces.
+// Mal: el click puede ejecutarse varias veces
 await waitFor(async () => {
   await user.click(screen.getByRole("button", { name: /guardar/i }));
   expect(await screen.findByRole("alert")).toBeInTheDocument();
 });
-```
 
-Mejor: ejecuta la acción una vez y espera el resultado.
-
-```javascript
+// Bien: la acción una vez, y después la espera
 await user.click(screen.getByRole("button", { name: /guardar/i }));
-
 expect(await screen.findByRole("alert")).toBeInTheDocument();
 ```
 
-## Esperar a que algo desaparezca
+## Esperar a que un elemento desaparezca
 
-Para desapariciones, la alternativa más clara suele ser `waitForElementToBeRemoved`.
+Para esperar a que algo desaparezca, por ejemplo un spinner de carga, Testing Library incluye `waitForElementToBeRemoved`:
 
 ```javascript
 await waitForElementToBeRemoved(() => screen.queryByRole("status"));
 ```
 
-También puedes usar `waitFor` con `queryByRole`.
+También puedes conseguir lo mismo con `waitFor` y `queryByRole`:
 
 ```javascript
 await waitFor(() => {
@@ -238,32 +207,21 @@ await waitFor(() => {
 });
 ```
 
-La diferencia importante es que para desaparición debes usar `queryBy...`, no `getBy...`, porque quieres permitir que el elemento no exista. Si usas `getBy...`, el test falla justo en el momento en el que la pantalla se comporta como esperabas.
+Fíjate en que en ambos casos se usa `queryByRole` y no `getByRole`. Tiene sentido: queremos permitir que el elemento no exista. Con `getByRole`, el test fallaría justo cuando la pantalla hace lo que esperábamos.
 
-## Otras formas de buscar en un test
+## Qué hacer cuando el rol no es suficiente
 
-Testing Library recomienda buscar de la forma más parecida posible a como una persona usa la interfaz. Esa es la brújula: primero lo accesible y semántico; al final, los detalles internos.
-
-El orden práctico sería:
-
-1. `getByRole` con `name` para botones, enlaces, encabezados, diálogos, alertas y la mayoría de elementos interactivos.
-2. `getByLabelText` para campos de formulario, especialmente cuando el rol no es suficiente.
-3. `getByPlaceholderText` solo si no hay label, aunque el placeholder no debería sustituir al label.
-4. `getByText` para textos no interactivos.
-5. `getByDisplayValue` para valores actuales de inputs.
-6. `getByAltText` para imágenes relevantes.
-7. `getByTitle` si el `title` forma parte real de la experiencia.
-8. `getByTestId` como último recurso.
-
-Un caso típico: `input type="password"` no tiene rol implícito, así que aquí `getByLabelText` es mejor que intentar forzar `getByRole`.
+No todos los elementos se pueden encontrar por rol. El caso típico es el `input type="password"`, que no tiene rol implícito. Para los campos de formulario, `getByLabelText` es una buena alternativa:
 
 ```javascript
 screen.getByLabelText(/contraseña/i);
 ```
 
-## Limita la búsqueda con `within`
+La documentación de Testing Library recomienda un orden de prioridad para las queries, de más a menos parecido a cómo un usuario percibe la página: primero `getByRole` y `getByLabelText`, después `getByPlaceholderText`, `getByText`, `getByDisplayValue`, `getByAltText` y `getByTitle`, y como último recurso `getByTestId`, que no se corresponde con nada que el usuario pueda ver.
 
-Si hay elementos repetidos, en vez de usar textos demasiado específicos, puedes acotar la búsqueda a una zona.
+## Acotar la búsqueda con within
+
+Cuando hay elementos repetidos, por ejemplo un botón de editar en cada fila de una tabla, en lugar de inventar textos rebuscados puedes acotar la búsqueda a una zona concreta con `within`:
 
 ```javascript
 const row = screen.getByRole("row", { name: /ada lovelace/i });
@@ -271,22 +229,10 @@ const row = screen.getByRole("row", { name: /ada lovelace/i });
 await user.click(within(row).getByRole("button", { name: /editar/i }));
 ```
 
-Esto hace que el test diga algo muy humano: "dentro de la fila de Ada, pulsa editar". Menos magia, más contexto.
+El test queda muy fácil de leer: dentro de la fila de Ada, pulsa el botón de editar.
 
-## Checklist rápido
+## Conclusión
 
-Si dudas, decide así:
+No hace falta memorizar todas las queries. Basta con tener clara la pregunta que responde cada una: `getByRole` para lo que ya existe, `findByRole` para lo que aparecerá, `queryByRole` para lo que no debe estar y `waitFor` para los efectos que no son elementos del DOM.
 
-| Situación                             | Usa                                                |
-| ------------------------------------- | -------------------------------------------------- |
-| El elemento debe existir ya           | `getByRole`                                        |
-| El elemento aparecerá después         | `findByRole`                                       |
-| El elemento no debe existir           | `queryByRole`                                      |
-| Hay varios elementos                  | `getAllByRole`, `findAllByRole` o `queryAllByRole` |
-| Esperas una llamada a un mock         | `waitFor`                                          |
-| Esperas que desaparezca un loader     | `waitForElementToBeRemoved`                        |
-| Buscas dentro de una sección concreta | `within`                                           |
-
-La idea no es memorizar todas las APIs. La idea es que la query cuente la intención del test: existe ahora, aparecerá después, no debe estar, hay varios o estoy esperando un efecto secundario.
-
-Un buen test no solo comprueba que la aplicación funciona. También deja una pista clara de cómo debería comportarse la pantalla. Elegir bien entre `getByRole`, `findByRole`, `queryByRole` y `waitFor` es una forma pequeña, pero muy efectiva, de escribir tests que se leen mejor y fallan por mejores motivos.
+La próxima vez que un test te falle de forma intermitente, antes de añadir un `waitFor` "por si acaso", revisa qué query estás usando. Lo más probable es que la solución sea cambiarla por la que de verdad describe lo que esperas de la pantalla.
