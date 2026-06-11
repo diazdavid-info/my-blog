@@ -4,7 +4,7 @@ description: "Guía de tar con ejemplos claros: comprimir y extraer archivos .ta
 h1: "Cómo usar tar para comprimir y descomprimir archivos"
 author: "Díaz"
 date: "2025-02-12"
-image: "https://cdn.diazdavid.es/compress-tar/post-comprimir-descomprimir-tar.webp"
+image: "https://cdn.diazdavid.es/compress-tar/post-comprimir-descomprimir-tar-2.webp"
 ---
 
 ## Comprimir con tar

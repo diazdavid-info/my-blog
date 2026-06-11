@@ -4,7 +4,7 @@ description: "Cómo cambiar la zona horaria en Chrome desde los Sensors de DevTo
 h1: "Simular diferentes timezone en el navegador Chrome"
 author: "Díaz"
 date: "2025-03-17"
-image: "https://cdn.diazdavid.es/timezone-chrome/simular-timezone-chrome.webp"
+image: "https://cdn.diazdavid.es/timezone-chrome/simular-timezone-chrome-2.webp"
 ---
 
 Cuando tu aplicación web es utilizada en distintas partes del mundo, es posible que necesites cambiar la zona horaria del 

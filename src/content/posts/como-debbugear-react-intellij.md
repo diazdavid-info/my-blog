@@ -4,7 +4,7 @@ description: "Crea una configuración de JavaScript Debug en IntelliJ IDEA para 
 h1: "Cómo configurar el debug de un proyecto React con IntelliJ"
 author: "Díaz"
 date: "2024-12-30"
-image: "https://cdn.diazdavid.es/debug-react-intellij/debugger-react-intellij.webp"
+image: "https://cdn.diazdavid.es/debug-react-intellij/debugger-react-intellij-2.webp"
 ---
 
 En este post, aprenderemos a configurar el entorno de depuración para un proyecto de React utilizando IntelliJ IDEA.
